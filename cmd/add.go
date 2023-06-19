@@ -1,3 +1,4 @@
+// Package cmd provides command-line interfaces for interacting with SSH configurations.
 package cmd
 
 import (
@@ -19,6 +20,7 @@ type ConfigOptions struct {
 	SSHKey    string
 }
 
+// AddCmd represents the Cobra command for adding a new SSH configuration or keys.
 var AddCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add a new SSH configuration or keys",

@@ -1,3 +1,4 @@
+// Package cmd provides command-line interfaces for interacting with SSH configurations.
 package cmd
 
 import (
@@ -8,6 +9,7 @@ import (
 	"strings"
 )
 
+// RemoveCmd represents the Cobra command for removing a host from the SSH configuration file ~/.ssh/config.
 var RemoveCmd = &cobra.Command{
 	Use:   "remove [name]",
 	Short: "Remove an SSH configuration",

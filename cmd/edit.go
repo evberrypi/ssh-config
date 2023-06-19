@@ -1,3 +1,4 @@
+// Package cmd provides command-line interfaces for interacting with SSH configurations.
 package cmd
 
 import (
@@ -10,6 +11,7 @@ import (
 
 var execCommand = exec.Command
 
+// EditCmd represents the Cobra command for editing SSH configuration files (~/.ssh/config, ~/.ssh/authorized_keys and ~/.ssh/known_hosts).
 var EditCmd = &cobra.Command{
 	Use:   "edit [config|keys|hosts]",
 	Short: "Edits SSH config, authorized_keys, or known_hosts file",
