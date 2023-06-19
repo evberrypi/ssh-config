@@ -1,4 +1,4 @@
-module ssh-config
+module github.com/evberrypi/ssh-config
 
 go 1.20
 
