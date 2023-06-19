@@ -48,7 +48,7 @@ var ListCmd = &cobra.Command{
 				fmt.Println("Error:", err)
 				return
 			}
-			fmt.Print(string(content))
+			cmd.Print(string(content))
 		}
 	},
 }

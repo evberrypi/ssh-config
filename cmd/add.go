@@ -198,7 +198,9 @@ func addServiceKey(service, username string) {
 	}
 	defer file.Close()
 
-	_, err = file.WriteString("\n" + string(keys))
+	// Annotate the config file to specify when something is added
+	comment := "# This key was added via " + service + " via the ssh-config tool\n"
+	_, err = file.WriteString("\n" + comment + string(keys))
 	if err != nil {
 		fmt.Printf("Error writing to authorized_keys: %v\n", err)
 		return

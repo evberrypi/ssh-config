@@ -8,6 +8,8 @@ import (
 	"os/exec"
 )
 
+var execCommand = exec.Command
+
 var EditCmd = &cobra.Command{
 	Use:   "edit [config|keys|hosts]",
 	Short: "Edits SSH config, authorized_keys, or known_hosts file",
@@ -34,7 +36,7 @@ var EditCmd = &cobra.Command{
 			}
 		}
 
-		command := exec.Command(editor, configPath)
+		command := execCommand(editor, configPath)
 		command.Stdin = os.Stdin
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
