@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/evberrypi/ssh-config/cmd"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{

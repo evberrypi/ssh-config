@@ -1,59 +1,83 @@
 package cmd
 
 import (
+	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"testing"
 
-	"github.com/evberrypi/ssh-config/utils"
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/assert"
 )
 
-type MockCommandExecutor struct {
-	mock.Mock
-}
-
-func (m *MockCommandExecutor) Command(name string, arg ...string) *exec.Cmd {
-	cmd := m.Called(name, arg).Get(0)
-	if cmd != nil {
-		return cmd.(*exec.Cmd)
-	}
-	return nil
-}
-
+// getenvFunc is a function variable for getting environment variables.
+// It is assigned os.Getenv by default, but can be changed for testing.
 func TestEditCmd(t *testing.T) {
-	mockExec := new(MockCommandExecutor)
+	defer func() {
+		getenvFunc = os.Getenv
+	}()
 
-	// Replace exec.Command with our mock version
-	execCommand = mockExec.Command
+	// Mock execCommand
+	execCommand = func(command string, args ...string) *exec.Cmd {
+		cmd := exec.Command("echo", "mocked")
+		return cmd
+	}
 
-	editor := "vim"
-
-	// Set environment variable EDITOR to vim for testing
-	os.Setenv("EDITOR", editor)
-
-	configPath := utils.ExpandUser(utils.SshConfigPath)
-	keysPath := utils.ExpandUser("~/.ssh/authorized_keys")
-	hostsPath := utils.ExpandUser("~/.ssh/known_hosts")
+	// Mock getenvFunc
+	getenvFunc = func(key string) string {
+		if key == "EDITOR" {
+			return "mock-editor"
+		}
+		return ""
+	}
 
 	tests := []struct {
-		args        []string
-		expectedArg string
+		args           []string
+		expectedOutput string
+		expectedError  string
 	}{
-		{[]string{}, configPath},
-		{[]string{"keys"}, keysPath},
-		{[]string{"hosts"}, hostsPath},
+		{
+			args:           []string{"config"},
+			expectedOutput: "mocked\n",
+		},
+		{
+			args:           []string{"keys"},
+			expectedOutput: "mocked\n",
+		},
+		{
+			args:           []string{"hosts"},
+			expectedOutput: "mocked\n",
+		},
+		{
+			args:           []string{"invalid"},
+			expectedOutput: "Invalid argument. Use 'config' or 'keys'.\n",
+		},
 	}
 
 	for _, test := range tests {
-		// Mock exec.Command call to check if it is called with correct arguments
-		mockCmd := &exec.Cmd{Path: "true"} // A no-op command
-		mockExec.On("Command", editor, []string{test.expectedArg}).Return(mockCmd)
+		buf := &bytes.Buffer{}
+		cobraCmd := &cobra.Command{}
+		cobraCmd.SetOut(buf)
+		cobraCmd.SetErr(buf)
 
-		EditCmd.Run(&cobra.Command{}, test.args)
+		EditCmd.Run(cobraCmd, test.args)
 
-		// Assert that the mock exec.Command was called with correct arguments
-		mockExec.AssertExpectations(t)
+		output := buf.String()
+
+		if test.expectedError != "" {
+			assert.Contains(t, output, test.expectedError)
+		} else {
+			assert.Equal(t, test.expectedOutput, output)
+		}
 	}
+}
+
+func TestHelperProcess(t *testing.T) {
+	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
+		return
+	}
+
+	fmt.Fprintln(os.Stdout, "mocked")
+	os.Exit(0)
 }

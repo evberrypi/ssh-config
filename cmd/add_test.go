@@ -48,7 +48,7 @@ func TestAddServiceKey(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	comment := "# This key was added via github via the ssh-config tool"
+	comment := "# Key(s) was added from github via ssh-config"
 	if !strings.Contains(string(content), comment) {
 		t.Errorf("expected %q to contain %q", content, comment)
 	}

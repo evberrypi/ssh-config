@@ -12,7 +12,7 @@ import (
 // RemoveCmd represents the Cobra command for removing a host from the SSH configuration file ~/.ssh/config.
 var RemoveCmd = &cobra.Command{
 	Use:   "remove [name]",
-	Short: "Remove an SSH configuration",
+	Short: "Remove a SSH host from the SSH configuration file",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]

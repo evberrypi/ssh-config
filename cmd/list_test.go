@@ -38,7 +38,8 @@ func TestListCmd(t *testing.T) {
 		Short: "List SSH configurations or fetch SSH keys from GitHub/GitLab",
 		Run:   ListCmd.Run,
 	}
-	cmd.SetArgs([]string{})
+	// Here, pass "config" argument to command.
+	cmd.SetArgs([]string{"config"})
 	cmd.SetOut(&buf)
 	cmd.Execute()
 

@@ -36,7 +36,7 @@ var configCmd = &cobra.Command{
 var configOptions ConfigOptions
 
 var gitHubKeyCmd = &cobra.Command{
-	Use:   "github-key [username]",
+	Use:   "github [username]",
 	Short: "Add GitHub keys to authorized_keys",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -45,7 +45,7 @@ var gitHubKeyCmd = &cobra.Command{
 }
 
 var gitLabKeyCmd = &cobra.Command{
-	Use:   "gitlab-key [username]",
+	Use:   "gitlab [username]",
 	Short: "Add GitLab keys to authorized_keys",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -89,26 +89,6 @@ func runConfigCmd(cmd *cobra.Command, args []string) {
 	}
 	configOptions.SSHKey = utils.ExpandUser(configOptions.SSHKey)
 
-	fmt.Print("Enter the SSH host name: ")
-	name, _ := reader.ReadString('\n')
-	name = strings.TrimSpace(name)
-
-	fmt.Print("Enter the IP address: ")
-	ip, _ := reader.ReadString('\n')
-	ip = strings.TrimSpace(ip)
-
-	fmt.Print("Enter the username: ")
-	user, _ := reader.ReadString('\n')
-	user = strings.TrimSpace(user)
-
-	fmt.Print("Enter the SSH key path (leave empty for default): ")
-	key, _ := reader.ReadString('\n')
-	key = strings.TrimSpace(key)
-	if key == "" {
-		key = "~/.ssh/id_rsa.pub"
-	}
-	key = utils.ExpandUser(key)
-
 	extraArgs := make(map[string]string)
 	fmt.Println("Enter extra SSH arguments in format key=value, type 'done' to finish:")
 	for {
@@ -125,7 +105,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	configBlock := fmt.Sprintf("Host %s\n    HostName %s\n    User %s\n    IdentityFile %s\n", name, ip, user, key)
+	configBlock := fmt.Sprintf("Host %s\n    HostName %s\n    User %s\n    IdentityFile %s\n", configOptions.HostName, configOptions.IPAddress, configOptions.Username, configOptions.SSHKey)
 	for arg, value := range extraArgs {
 		configBlock += fmt.Sprintf("    %s %s\n", arg, value)
 	}
@@ -143,7 +123,6 @@ func runConfigCmd(cmd *cobra.Command, args []string) {
 		fmt.Println("Error:", err)
 	}
 }
-
 
 func addServiceKey(service, username string, fs afero.Fs) {
 	url, found := serviceURLs[service]
@@ -190,7 +169,7 @@ func addServiceKey(service, username string, fs afero.Fs) {
 	defer file.Close()
 
 	// Annotate the config file to specify when something is added
-	comment := "# This key was added via " + service + " via the ssh-config tool\n"
+	comment := "# Key(s) was added from " + service + " via ssh-config\n"
 	_, err = file.WriteString("\n" + comment + string(keys))
 	if err != nil {
 		fmt.Printf("Error writing to authorized_keys: %v\n", err)

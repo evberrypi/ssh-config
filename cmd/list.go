@@ -10,10 +10,10 @@ import (
 	"os"
 )
 
-// ListCmd represents the Cobra command for listing SSH configuration of ~/.ssh/config 
+// ListCmd represents the Cobra command for listing SSH configuration of ~/.ssh/config
 // or the public keys on gitlab.com and github.com for a specific user.
 var ListCmd = &cobra.Command{
-	Use:   "list [github-keys|gitlab-keys] [username]",
+	Use:   "list [config|keys|github|gitlab] [username]",
 	Short: "List SSH configurations or fetch SSH keys from GitHub/GitLab",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 2 {
@@ -22,12 +22,12 @@ var ListCmd = &cobra.Command{
 			url := ""
 
 			switch platform {
-			case "github-keys":
+			case "github":
 				url = "https://github.com/" + username + ".keys"
-			case "gitlab-keys":
+			case "gitlab":
 				url = "https://gitlab.com/" + username + ".keys"
 			default:
-				fmt.Println("Unknown platform. Use 'github-keys' or 'gitlab-keys'.")
+				fmt.Println("Unknown platform. Use 'github' or 'gitlab'.")
 				return
 			}
 
@@ -44,14 +44,29 @@ var ListCmd = &cobra.Command{
 			} else {
 				fmt.Println("Error fetching keys. HTTP status:", resp.Status)
 			}
-		} else {
-			configPath := utils.ExpandUser(utils.SshConfigPath)
-			content, err := os.ReadFile(configPath)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
+		} else if len(args) == 1 {
+			switch args[0] {
+			case "keys":
+				keysPath := utils.ExpandUser("~/.ssh/authorized_keys")
+				content, err := os.ReadFile(keysPath)
+				if err != nil {
+					fmt.Println("Error:", err)
+					return
+				}
+				fmt.Println(string(content))
+			case "config":
+				configPath := utils.ExpandUser(utils.SshConfigPath)
+				content, err := os.ReadFile(configPath)
+				if err != nil {
+					fmt.Println("Error:", err)
+					return
+				}
+				cmd.Print(string(content))
+			default:
+				fmt.Println("Invalid argument. Use 'config', 'keys', 'github [username]' or 'gitlab [username]'.")
 			}
-			cmd.Print(string(content))
+		} else {
+			fmt.Println("Invalid number of arguments. Use 'ssh-config list --help' for usage information.")
 		}
 	},
 }
