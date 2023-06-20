@@ -10,7 +10,8 @@ import (
 	"os"
 )
 
-// ListCmd represents the Cobra command for listing SSH configuration of ~/.ssh/config or the public keys on gitlab.com and github.com for a specific user.
+// ListCmd represents the Cobra command for listing SSH configuration of ~/.ssh/config 
+// or the public keys on gitlab.com and github.com for a specific user.
 var ListCmd = &cobra.Command{
 	Use:   "list [github-keys|gitlab-keys] [username]",
 	Short: "List SSH configurations or fetch SSH keys from GitHub/GitLab",
