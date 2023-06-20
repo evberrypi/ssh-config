@@ -61,7 +61,7 @@ var ListCmd = &cobra.Command{
 					fmt.Println("Error:", err)
 					return
 				}
-				cmd.Print(string(content))
+				fmt.Fprintln(cmd.OutOrStdout(), string(content)) // Write to the command's output stream
 			default:
 				fmt.Println("Invalid argument. Use 'config', 'keys', 'github [username]' or 'gitlab [username]'.")
 			}

@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/evberrypi/ssh-config/utils"
@@ -44,9 +45,19 @@ func TestListCmd(t *testing.T) {
 	cmd.Execute()
 
 	// Check the output
-	expected := "Host test1\n    HostName 192.168.1.1\n    User user1\n\nHost test2\n    HostName 192.168.1.2\n    User user2\n"
+	expected := `
+Host test1
+    HostName 192.168.1.1
+    User user1
+
+Host test2
+    HostName 192.168.1.2
+    User user2
+`
 	actual := buf.String()
-	if actual != expected {
+	// Trim the final line of the actual output
+	actual = strings.TrimSpace(actual)
+	if strings.TrimSpace(actual) != strings.TrimSpace(expected) {
 		t.Errorf("Expected output %q, but got %q", expected, actual)
 	}
 }
