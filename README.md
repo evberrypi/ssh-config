@@ -30,7 +30,7 @@ ssh-config-tool/
 To install `ssh-config`, use the following command:
 
 ```bash
-go get github.com/your-username/ssh-config
+go get github.com/evberrypi/ssh-config
 ```
 
 ## Commands
