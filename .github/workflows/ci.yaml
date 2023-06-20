@@ -49,10 +49,13 @@ jobs:
 
       - name: Build for ${{ matrix.os }}/${{ matrix.arch }}
         run: |
-          # Set up variables# Assuming 1.20 is available
+          # Create build directory
+          mkdir build
+          # Set up variables
           OUTPUT_DIR="build/${{ matrix.os }}-${{ matrix.arch }}"
           
           # Build the binary
+          
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o "${OUTPUT_DIR}/${BINARY_NAME}"
 
       - name: Archive build artifacts
