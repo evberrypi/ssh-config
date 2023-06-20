@@ -1,22 +1,24 @@
 package cmd
 
 import (
-	"testing"
-	"github.com/stretchr/testify/mock"
-	"github.com/spf13/cobra"
-	"github.com/evberrypi/ssh-config/utils"
 	"os"
 	"os/exec"
+	"testing"
+
+	"github.com/evberrypi/ssh-config/utils"
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/mock"
 )
 
-// Mock for exec.Command
 type MockCommandExecutor struct {
 	mock.Mock
 }
 
 func (m *MockCommandExecutor) Command(name string, arg ...string) *exec.Cmd {
-	m.Called(name, arg)
-	// We return nil since we're just verifying the call
+	cmd := m.Called(name, arg).Get(0)
+	if cmd != nil {
+		return cmd.(*exec.Cmd)
+	}
 	return nil
 }
 
@@ -46,10 +48,11 @@ func TestEditCmd(t *testing.T) {
 
 	for _, test := range tests {
 		// Mock exec.Command call to check if it is called with correct arguments
-		mockExec.On("Command", editor, []string{test.expectedArg}).Return(nil)
-		
+		mockCmd := &exec.Cmd{Path: "true"} // A no-op command
+		mockExec.On("Command", editor, []string{test.expectedArg}).Return(mockCmd)
+
 		EditCmd.Run(&cobra.Command{}, test.args)
-		
+
 		// Assert that the mock exec.Command was called with correct arguments
 		mockExec.AssertExpectations(t)
 	}

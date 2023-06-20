@@ -15,9 +15,14 @@ ssh-config-tool/
 │ list.go
 │ remove.go
 │ edit.go
+│ add_test.go
+│ list_test.go
+│ remove_test.go
+│ edit_test.go
 │
 └───utils/
 │ utils.go
+| utils_test.go
 ```
 
 ## Installation

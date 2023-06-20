@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/evberrypi/ssh-config/utils"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +40,7 @@ var gitHubKeyCmd = &cobra.Command{
 	Short: "Add GitHub keys to authorized_keys",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		addServiceKey("github", args[0])
+		addServiceKey("github", args[0], afero.NewOsFs())
 	},
 }
 
@@ -48,7 +49,7 @@ var gitLabKeyCmd = &cobra.Command{
 	Short: "Add GitLab keys to authorized_keys",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		addServiceKey("gitlab", args[0])
+		addServiceKey("gitlab", args[0], afero.NewOsFs())
 	},
 }
 
@@ -143,7 +144,8 @@ func runConfigCmd(cmd *cobra.Command, args []string) {
 	}
 }
 
-func addServiceKey(service, username string) {
+
+func addServiceKey(service, username string, fs afero.Fs) {
 	url, found := serviceURLs[service]
 	if !found {
 		fmt.Println("Invalid service specified.")
@@ -172,28 +174,15 @@ func addServiceKey(service, username string) {
 
 	authorizedKeysPath := utils.ExpandUser("~/.ssh/authorized_keys")
 
-	// First read the entire authorized_keys file to check for existing keys
-	file, err := os.Open(authorizedKeysPath)
-	if err != nil {
-		fmt.Printf("Error opening authorized_keys for reading: %v\n", err)
+	// Ensure the .ssh directory exists
+	sshDir := utils.ExpandUser("~/.ssh")
+	if err := fs.MkdirAll(sshDir, os.ModePerm); err != nil {
+		fmt.Printf("Error creating .ssh directory: %v\n", err)
 		return
 	}
 
-	existingKeys, err := io.ReadAll(file)
-	file.Close()
-	if err != nil {
-		fmt.Printf("Error reading authorized_keys: %v\n", err)
-		return
-	}
-
-	// Check if key already exists
-	if strings.Contains(string(existingKeys), string(keys)) {
-		fmt.Println("Key already exists in authorized_keys.")
-		return
-	}
-
-	// Append the key if it doesn't exist
-	file, err = os.OpenFile(authorizedKeysPath, os.O_APPEND|os.O_WRONLY, 0600)
+	// Open or create the authorized_keys file
+	file, err := fs.OpenFile(authorizedKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Printf("Error opening authorized_keys for appending: %v\n", err)
 		return

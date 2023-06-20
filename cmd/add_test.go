@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/spf13/afero"
 )
 
 func TestAddServiceKey(t *testing.T) {
@@ -18,14 +23,27 @@ func TestAddServiceKey(t *testing.T) {
 	os.Setenv("HOME", tmpDir)
 
 	// Mock the key that would be fetched from GitHub or GitLab
-	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0g+ZTxC7weoIJLUafOgrm+h..."
+	mockKey := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0g+ZTxC7weoIJLUafOgrm+h..."
 
-	// Run the function - for this test example, we'll just check if it's able to write the comment and key correctly
-	addServiceKey("github", "testuser")
+	// Create a test server to mock the HTTP response
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, mockKey)
+	}))
+	defer ts.Close()
+
+	// Replace the serviceURLs map to use the test server URL
+	serviceURLs["github"] = ts.URL + "/%s.keys"
+
+	// Mock afero filesystem
+	fs := afero.NewMemMapFs()
+
+	// Run & check ability to write comment and key
+	addServiceKey("github", "testuser", fs)
 
 	// Check if the file contains the comment and key
 	authorizedKeysPath := tmpDir + "/.ssh/authorized_keys"
-	content, err := os.ReadFile(authorizedKeysPath)
+	aferoFs := afero.Afero{Fs: fs}
+	content, err := aferoFs.ReadFile(authorizedKeysPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +53,7 @@ func TestAddServiceKey(t *testing.T) {
 		t.Errorf("expected %q to contain %q", content, comment)
 	}
 
-	if !strings.Contains(string(content), key) {
-		t.Errorf("expected %q to contain %q", content, key)
+	if !strings.Contains(string(content), mockKey) {
+		t.Errorf("expected %q to contain %q", content, mockKey)
 	}
 }
