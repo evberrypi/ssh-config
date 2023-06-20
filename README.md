@@ -48,7 +48,7 @@ This command will prompt you for the SSH host name, IP address, username, SSH ke
 To add GitHub keys to authorized_keys, use the following command:
 
 ```bash
-ssh-config-tool add github-key [username]
+ssh-config-tool add github [username]
 ```
 
 This command will fetch the user's keys from GitHub and add them to the ~/.ssh/authorized_keys file.
@@ -56,7 +56,7 @@ This command will fetch the user's keys from GitHub and add them to the ~/.ssh/a
 To add GitLab keys to authorized_keys, use the following command:
 
 ```bash
-ssh-config-tool add gitlab-key [username]
+ssh-config-tool add gitlab [username]
 ```
 
 This command will fetch the user's keys from GitLab and add them to the ~/.ssh/authorized_keys file.
@@ -67,17 +67,23 @@ You can also refer to the updated "Commands" section in this README for the othe
 
 ### List
 
-To list existing SSH configurations, use the list command.
+To list existing SSH confile located at `~/.ssh/config`:
 
 ```bash
-ssh-config list
+ssh-config list config
+```
+
+To list existing SSH authorized keys file located at `~/.ssh/authorized_keys`:
+
+```bash
+ssh-config list config
 ```
 
 You can also fetch public SSH keys from GitHub or GitLab user accounts.
 
 ```bash
-ssh-config list github-keys [username]
-ssh-config list gitlab-keys [username]
+ssh-config list github [username]
+ssh-config list gitlab [username]
 ```
 
 ### Remove
