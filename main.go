@@ -10,6 +10,7 @@ var rootCmd = &cobra.Command{
 	Short: "Manage SSH configurations.",
 }
 
+// Basic main function. Please see 'cmd' and 'utils' directories more of what is going on
 func main() {
 	rootCmd.AddCommand(cmd.AddCmd)
 	rootCmd.AddCommand(cmd.ListCmd)
