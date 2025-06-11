@@ -62,9 +62,31 @@ var gitLabKeyCmd = &cobra.Command{
 	},
 }
 
-var serviceURLs = map[string]string{
-	"github": "https://github.com/%s.keys",
-	"gitlab": "https://gitlab.com/%s.keys",
+// promptForExtraArgs is a function variable for testability
+var promptForExtraArgs = func(reader *bufio.Reader) (map[string]string, error) {
+	extraArgs := make(map[string]string)
+	fmt.Println("Enter extra SSH arguments in format key=value, type 'done' to finish:")
+
+	for {
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			return nil, fmt.Errorf("failed to read extra arguments: %w", err)
+		}
+		input = strings.TrimSpace(input)
+
+		if input == "done" {
+			break
+		}
+
+		parts := strings.Split(input, "=")
+		if len(parts) == 2 {
+			extraArgs[parts[0]] = parts[1]
+		} else {
+			fmt.Println("Invalid format. Please use key=value format.")
+		}
+	}
+
+	return extraArgs, nil
 }
 
 func runConfigCmd(cmd *cobra.Command, args []string) error {
@@ -154,34 +176,8 @@ func promptForConfigOptions(reader *bufio.Reader) error {
 	return nil
 }
 
-func promptForExtraArgs(reader *bufio.Reader) (map[string]string, error) {
-	extraArgs := make(map[string]string)
-	fmt.Println("Enter extra SSH arguments in format key=value, type 'done' to finish:")
-
-	for {
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			return nil, fmt.Errorf("failed to read extra arguments: %w", err)
-		}
-		input = strings.TrimSpace(input)
-
-		if input == "done" {
-			break
-		}
-
-		parts := strings.Split(input, "=")
-		if len(parts) == 2 {
-			extraArgs[parts[0]] = parts[1]
-		} else {
-			fmt.Println("Invalid format. Please use key=value format.")
-		}
-	}
-
-	return extraArgs, nil
-}
-
 func addServiceKey(service, username string, fs afero.Fs) error {
-	url, found := serviceURLs[service]
+	url, found := utils.ServiceURLs[service]
 	if !found {
 		return fmt.Errorf("invalid service specified: %s", service)
 	}

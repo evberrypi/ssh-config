@@ -147,6 +147,14 @@ go build
 go test ./...
 ```
 
+### Building with Version Info
+
+To include build time and git commit in your binary, use:
+
+```sh
+go build -ldflags "-X github.com/evberrypi/ssh-config/version.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ) -X github.com/evberrypi/ssh-config/version.GitCommit=$(git rev-parse --short HEAD)"
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.

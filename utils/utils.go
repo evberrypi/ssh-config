@@ -26,6 +26,12 @@ var SSHPaths = struct {
 	KnownHosts:     DefaultKnownHostsPath,
 }
 
+// ServiceURLs allows patching in tests
+var ServiceURLs = map[string]string{
+	"github": "https://github.com/%s.keys",
+	"gitlab": "https://gitlab.com/%s.keys",
+}
+
 // ExpandUser expands the tilde (~) in a file path to the user's home directory.
 // If the path is "~", it returns the value of the HOME environment variable.
 // If the path starts with "~/", it replaces the tilde with the home directory path.
