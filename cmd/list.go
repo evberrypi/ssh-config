@@ -3,11 +3,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/evberrypi/ssh-config/utils"
-	"github.com/spf13/cobra"
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/evberrypi/ssh-config/utils"
+	"github.com/spf13/cobra"
 )
 
 // ListCmd represents the Cobra command for listing SSH configuration of ~/.ssh/config
@@ -55,7 +56,7 @@ var ListCmd = &cobra.Command{
 				}
 				fmt.Println(string(content))
 			case "config":
-				configPath := utils.ExpandUser(utils.SshConfigPath)
+				configPath := utils.ExpandUser(utils.SSHPaths.Config)
 				content, err := os.ReadFile(configPath)
 				if err != nil {
 					fmt.Println("Error:", err)

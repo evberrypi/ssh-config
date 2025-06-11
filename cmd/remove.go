@@ -3,10 +3,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/evberrypi/ssh-config/utils"
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
+
+	"github.com/evberrypi/ssh-config/utils"
+	"github.com/spf13/cobra"
 )
 
 // RemoveCmd represents the Cobra command for removing a host from the SSH configuration file ~/.ssh/config.
@@ -17,7 +18,7 @@ var RemoveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 
-		configPath := utils.ExpandUser(utils.SshConfigPath)
+		configPath := utils.ExpandUser(utils.SSHPaths.Config)
 		content, err := os.ReadFile(configPath)
 		if err != nil {
 			fmt.Println("Error:", err)

@@ -23,7 +23,7 @@ var EditCmd = &cobra.Command{
 			editor = "vim"
 		}
 
-		configPath := utils.ExpandUser(utils.SshConfigPath)
+		configPath := utils.ExpandUser(utils.SSHPaths.Config)
 
 		if len(args) > 0 {
 			switch args[0] {

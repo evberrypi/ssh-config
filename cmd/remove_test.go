@@ -34,7 +34,7 @@ Host test2
 	}
 
 	// Mock SshConfigPath in utils package
-	utils.SshConfigPath = tmpfile.Name()
+	utils.SSHPaths.Config = tmpfile.Name()
 
 	// Execute RemoveCmd
 	cmd := &cobra.Command{}

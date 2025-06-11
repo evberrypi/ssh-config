@@ -28,7 +28,7 @@ func TestListCmd(t *testing.T) {
 	}
 
 	// Mock SshConfigPath in utils package
-	utils.SshConfigPath = tmpfile.Name()
+	utils.SSHPaths.Config = tmpfile.Name()
 
 	// Buffer to capture stdout
 	var buf bytes.Buffer
